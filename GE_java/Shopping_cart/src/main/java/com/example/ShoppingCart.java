@@ -1,29 +1,43 @@
 package com.example;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-public class ShoppingCart {    
-    private List<Item> shoppingList = new ArrayList<>();
+public class ShoppingCart {
+    private Map<Item, Integer> cartItems = new HashMap<>();
 
-    public List<Item> getItems() {
-        return shoppingList;
+    public void addItem(Item item, int quantity) {
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("Quantity must be greater than zero.");
+        }
+
+        cartItems.put(item, cartItems.getOrDefault(item, 0) + quantity);
     }
 
-    public void addItem(Item item){
-        shoppingList.add(item);
+    public void removeItem(Item item, int quantity) {
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("Quantity must be greater than zero.");
+        }
+
+        int currentQuantity = cartItems.getOrDefault(item, 0);
+        if (currentQuantity - quantity <= 0) {
+            cartItems.remove(item);
+        } else {
+            cartItems.put(item, currentQuantity - quantity);
+        }
     }
 
-    public void removeItem(Item item){
-        shoppingList.remove(item);
+    public Map<Item, Integer> getCartItems() {
+        return new HashMap<>(cartItems); // Return a copy to prevent external modifications
     }
 
     public double calculateTotalPrice() {
         double total = 0.0;
-        for (Item item : shoppingList) {
-            total += item.getPrice();
+        for (Map.Entry<Item, Integer> entry : cartItems.entrySet()) {
+            Item item = entry.getKey();
+            int quantity = entry.getValue();
+            total += item.getPrice() * quantity;
         }
         return total;
     }
-
 }

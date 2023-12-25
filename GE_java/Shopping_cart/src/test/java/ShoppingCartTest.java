@@ -1,87 +1,76 @@
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+//import org.junit.jupiter.api.Test;
 
 import com.example.Item;
 import com.example.ShoppingCart;
 
 public class ShoppingCartTest {
-    
-    //Test creating an item with valid details.●Test getting item details.
-    @Test
-    public void testCreateItem() {
-        int itemId = 1;
-        String itemName = "Dress";
-        double itemPrice = 1299.00;
 
-        Item item = new Item(itemId, itemName, itemPrice);
+    private ShoppingCart cart;
+    private Item laptop;
+    private Item mouse;
+    private Item keyboard;
 
-        assertEquals(itemId, item.getId());
-        assertEquals(itemName, item.getName());
-        assertEquals(itemPrice, item.getPrice());
+    @BeforeEach
+    public void setUp() {
+        cart = new ShoppingCart();
+        laptop = new Item(1, "Laptop", 30000.00);
+        mouse = new Item(2, "Mouse", 5000.00);
+        keyboard = new Item(3, "Keyboard", 7500.00);
     }
 
-    //●Test adding items to the cart.
     @Test
-    public void testAddingItems() {
-        ShoppingCart shoppingCart = new ShoppingCart();
-        Item item1 = new Item(1, "Pen", 59.00);
-        Item item2 = new Item(2, "Notebook", 90.00);
-        Item item3 = new Item(3, "Pencil", 10.00);
+    public void testAddItemToCart() {
+        cart.addItem(laptop, 2);
+        cart.addItem(mouse, 3);
+        cart.addItem(keyboard, 1);
 
-        shoppingCart.addItem(item1);
-        shoppingCart.addItem(item2);
-        shoppingCart.addItem(item3);
-
-        assertEquals(3, shoppingCart.getItems().size());
-        assertTrue(shoppingCart.getItems().contains(item1));
-        assertTrue(shoppingCart.getItems().contains(item2));
-        assertTrue(shoppingCart.getItems().contains(item3));
+        assertEquals(3, cart.getCartItems().size());
+        assertEquals(2, cart.getCartItems().get(laptop));
+        assertEquals(3, cart.getCartItems().get(mouse));
+        assertEquals(1, cart.getCartItems().get(keyboard));
     }
 
-    //●Test removing items from the cart.
     @Test
-    public void testRemmovingItems(){
-        ShoppingCart shoppingCart = new ShoppingCart();
-        Item item = new Item(1, "Milk", 100.00);
+    public void testRemoveItemFromCart() {
+        cart.addItem(laptop, 2);
+        cart.addItem(mouse, 3);
 
-        shoppingCart.addItem(item);
-        shoppingCart.removeItem(item);
+        cart.removeItem(laptop, 1);
 
-        assertEquals(0, shoppingCart.getItems().size());
-        assertFalse(shoppingCart.getItems().contains(item));
+        assertEquals(2, cart.getCartItems().size());
+        assertEquals(1, cart.getCartItems().get(laptop));
+        assertEquals(3, cart.getCartItems().get(mouse));
 
+        cart.removeItem(laptop, 1);
+        cart.removeItem(mouse, 3);
+
+        assertEquals(0, cart.getCartItems().size());
+        assertFalse(cart.getCartItems().containsKey(laptop));
+        assertFalse(cart.getCartItems().containsKey(mouse));
     }
 
-    //●Test viewing items in the cart.
     @Test
-    public void viewItems(){
-        ShoppingCart shoppingCart = new ShoppingCart();
-        Item item1 = new Item(1, "Tea", 150.00);
-        Item item2 = new Item(1, "Coffee", 200.00);
+    public void testViewItemsInCart() {
+        cart.addItem(laptop, 2);
+        cart.addItem(mouse, 3);
 
-        shoppingCart.addItem(item1);
-        shoppingCart.addItem(item2);
-
-        assertEquals(2, shoppingCart.getItems().size());
-        assertTrue(shoppingCart.getItems().contains(item1));
-        assertTrue(shoppingCart.getItems().contains(item2));
+        assertEquals(2, cart.getCartItems().size());
+        assertEquals(2, cart.getCartItems().get(laptop));
+        assertEquals(3, cart.getCartItems().get(mouse));
     }
 
-    //●Test calculating the total price of items in the cart.
     @Test
     public void testCalculateTotalPrice() {
-        ShoppingCart shoppingCart = new ShoppingCart();
-        Item item1 = new Item(1, "Laptop", 20000.00);
-        Item item2 = new Item(2, "Mouse", 2500.00);
+        cart.addItem(laptop, 2);
+        cart.addItem(mouse, 3);
 
-        shoppingCart.addItem(item1);
-        shoppingCart.addItem(item2);
+        double totalPrice = cart.calculateTotalPrice();
 
-        double totalPrice = shoppingCart.calculateTotalPrice();
-
-        assertEquals(22500.00, totalPrice);
+        assertEquals(2 * laptop.getPrice() + 3 * mouse.getPrice(), totalPrice, 0.01);
     }
 }
